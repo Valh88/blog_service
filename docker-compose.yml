@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - ./app:/app
+    command: uvicorn main:app --reload --host 0.0.0.0
+    ports:
+      - 8000:8000
+    networks:
+      - net
+
+
+  nginx:
+    build: ./nginx
+    volumes:
+#     - ./static:/static
+      - ./static:/www/data/static
+      - ./images:/www/data/images
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+    networks:
+      - net
+networks:
+  net: {}
