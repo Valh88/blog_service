@@ -1,8 +1,13 @@
 import shutil
 import uuid
-from fastapi import APIRouter, File, Form, UploadFile
-from schemas import TweetSchema
+from typing import List
+from fastapi import APIRouter, File, Form, UploadFile, Depends
+import schemas
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
+from db import models
+from db.database import get_db
+from security import get_apikey_header
 
 router = APIRouter(
   prefix='/api',
@@ -10,8 +15,17 @@ router = APIRouter(
 )
 
 
-@router.post('/tweets')
-async def create_tweet(tweet: TweetSchema):
+@router.get('/tweets', response_model=List[schemas.TweetsOut])
+async def all_tweets(api_key: str = Depends(get_apikey_header),
+                     db: Session = Depends(get_db)) -> schemas.TweetResult:
+    tweets = db.query(models.Tweet).all()
+    print(tweets, 1111111111111111111111111111)
+
+    return {"user": tweets}
+
+
+@router.post('/tweets', response_model=schemas.TweetSchema)
+async def create_tweet(tweet: schemas.TweetSchema):
     pass
     return tweet
 
@@ -48,6 +62,6 @@ async def follow_to_user(id):
 
 
 @router.delete('/tweets/{id:int}/follow')
-async def follow_to_user(id):
+async def delete_follow_to_user(id):
 
     return JSONResponse({"result": True})

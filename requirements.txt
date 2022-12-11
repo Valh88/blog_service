@@ -5,3 +5,4 @@ psycopg2-binary==2.9.5
 alembic==1.8.1
 uvicorn==0.20.0
 pydentic
+python-jose==3.3.0
