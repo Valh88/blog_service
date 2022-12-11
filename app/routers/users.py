@@ -27,7 +27,6 @@ async def get_user_profile(api_key: str = Depends(get_apikey_header),
     """
 
     # user = await User.get_user_by_token(db, api_key)
-
     user = db.query(User).filter(User.id == 2).first()
-    user_model = schemas.UserFull(id=user.id, name=user.name, followers=user.followers, followoing=user.following)
-    return {"result": True, "user": user_model}
+    user = schemas.UserFull.from_orm(user)
+    return {"result": True, "user": user}

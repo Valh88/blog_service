@@ -15,13 +15,11 @@ router = APIRouter(
 )
 
 
-@router.get('/tweets', response_model=List[schemas.TweetsOut])
+@router.get('/tweets', response_model=schemas.TweetResult)
 async def all_tweets(api_key: str = Depends(get_apikey_header),
                      db: Session = Depends(get_db)) -> schemas.TweetResult:
     tweets = db.query(models.Tweet).all()
-    print(tweets, 1111111111111111111111111111)
-
-    return {"user": tweets}
+    return {"result": True, "tweets": [schemas.TweetsOut.from_orm(tweet) for tweet in tweets]}
 
 
 @router.post('/tweets', response_model=schemas.TweetSchema)
