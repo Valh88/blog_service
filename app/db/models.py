@@ -65,6 +65,9 @@ class Tweet(Base):
     attachments = relationship('Picture', back_populates='tweet', cascade='delete')
     likes = relationship('User', secondary=TweetLikeUser, back_populates='tweets_like')
 
+    def __str__(self):
+        return f"{self.content}"
+
 
 class Picture(Base):
     __tablename__ = 'pictures'
@@ -73,3 +76,7 @@ class Picture(Base):
     path = Column(String, unique=True, nullable=False)
     tweet_id = Column(Integer, ForeignKey('tweets.id'), nullable=False)
     tweet = relationship('Tweet', back_populates='attachments')
+
+    def __str__(self):
+        return f"{self.path}"
+

@@ -1,6 +1,6 @@
 import shutil
 import uuid
-from typing import List
+from typing import List, Dict
 from fastapi import APIRouter, File, Form, UploadFile, Depends
 import schemas
 from fastapi.responses import JSONResponse
@@ -22,20 +22,12 @@ async def all_tweets(api_key: str = Depends(get_apikey_header),
     return {"result": True, "tweets": [schemas.TweetsOut.from_orm(tweet) for tweet in tweets]}
 
 
-@router.post('/tweets', response_model=schemas.TweetSchema)
-async def create_tweet(tweet: schemas.TweetSchema):
-    pass
-    return tweet
+@router.post('/tweets')
+async def create_tweet(tweet: schemas.TweetAdd, api_key: str = Depends(get_apikey_header),
+                       db: Session = Depends(get_db)):
+    print(tweet.tweet_data, tweet.tweet_media_ids)
 
-
-@router.post('/medias')
-async def get_upload_picture(picture: UploadFile = File(...)):
-    picture.filename = str(uuid.uuid4()) + '.jpg'
-    path = f"media/{picture.filename}"
-    with open(path, 'w+b') as buffer:
-        shutil.copyfileobj(picture.file, buffer)
-
-    return JSONResponse({"result": True})
+    return {"result": True, "tweet_id": 1}
 
 
 @router.delete('/tweets/{id:int}')

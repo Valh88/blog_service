@@ -2,9 +2,9 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 
 
-class TweetSchema(BaseModel):
-    data: str
-    media: List[int] = []
+class TweetAdd(BaseModel):
+    tweet_data: str
+    tweet_media_ids: Optional[List[int]] = None
 
 
 class UserForMe(BaseModel):
@@ -36,10 +36,6 @@ class UserFull(BaseModel):
 class UserMeOut(BaseModel):
     result: bool = True
     user: UserFull
-    # id: int
-    # username: str
-    # followers: List[UserForMe] = []
-    # following: List[UserForMe] = []
 
     class Config:
         orm_mode = True

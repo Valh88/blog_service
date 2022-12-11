@@ -9,9 +9,9 @@ WORKDIR app
 
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requirements.txt
-RUN adduser \
-        --disabled-password \
-        --no-create-home \
-        no-sudo-user
+#RUN adduser \
+#        --disabled-password \
+#        --no-create-home \
+#        no-sudo-user
 
-USER no-sudo-user
+#USER no-sudo-user
