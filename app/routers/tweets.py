@@ -1,13 +1,10 @@
-import shutil
-import uuid
-from typing import List, Dict
-from fastapi import APIRouter, File, Form, UploadFile, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 import schemas
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from db import models
 from db.database import get_db
-from security import get_apikey_header
+from security import get_apikey_header, get_current_user
 
 router = APIRouter(
   prefix='/api',
@@ -16,7 +13,7 @@ router = APIRouter(
 
 
 @router.get('/tweets', response_model=schemas.TweetResult)
-async def all_tweets(api_key: str = Depends(get_apikey_header),
+async def all_tweets(current_user: schemas.UserFull = Depends(get_current_user),
                      db: Session = Depends(get_db)) -> schemas.TweetResult:
     tweets = db.query(models.Tweet).all()
     return {"result": True, "tweets": [schemas.TweetsOut(id=tweet.id,
@@ -27,11 +24,11 @@ async def all_tweets(api_key: str = Depends(get_apikey_header),
 
 
 @router.post('/tweets')
-async def create_tweet(tweet: schemas.TweetAdd, api_key: str = Depends(get_apikey_header),
+async def create_tweet(tweet: schemas.TweetAdd, current_user: schemas.UserFull = Depends(get_current_user),
                        db: Session = Depends(get_db)):
-    print(tweet.tweet_data, tweet.tweet_media_ids)
-
-    return {"result": True, "tweet_id": 1}
+    tweet = models.Tweet(content=tweet.tweet_data, author_id=current_user.id)
+    db.add(tweet), db.commit()
+    return {"result": True, "tweet_id": tweet.id}
 
 
 @router.delete('/tweets/{id:int}')

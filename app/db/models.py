@@ -62,7 +62,7 @@ class Tweet(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     author_id = Column(Integer, ForeignKey('users.id'))
     author = relationship('User', back_populates='tweets')
-    attachments = relationship('Picture', back_populates='tweet', cascade='delete')
+    attachments = relationship('Picture', back_populates='tweet', cascade='delete, all')
     likes = relationship('User', secondary=TweetLikeUser, back_populates='tweets_like')
 
     def __str__(self):

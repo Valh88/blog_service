@@ -12,7 +12,7 @@ app.include_router(media.router)
 # app.mount('/images', StaticFiles(directory='../images'), name='files')
 
 
-@app.get('/')
-async def test():
-
-    return 'ok'
+# @app.get('/')
+# async def test():
+#
+#     return 'ok'

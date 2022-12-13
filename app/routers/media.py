@@ -24,6 +24,4 @@ async def get_upload_picture(file: UploadFile = Form(...)):
 
 @router.get('/media/{name}', response_class=FileResponse)
 def get_file(name: str):
-    path = f'images/{name}'
-    return path
-
+   pass

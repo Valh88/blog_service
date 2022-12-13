@@ -24,13 +24,13 @@ def override_get_db():
     connection.close()
 
 
-# app.dependency_overrides[get_db] = override_get_db
+app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 session = SessionLocal()
 
 
 def test_models():
-    Base.metadata.create_all()
+    # Base.metadata.create_all()
     # user3 = User(name='name3')
     # user = User(name='name2')
     # user2 = User(name='name1')
@@ -38,7 +38,7 @@ def test_models():
     # session.add(user2)
     # session.add(user3)
     # session.commit()
-    # user = session.query(User).filter(User.name == 'name1').first()
+    user = session.query(User).filter(User.name == 'name1').first()
     # user2 = session.query(User).filter(User.name == 'name2').first()
     # user3 = session.query(User).filter(User.name == 'name3').first()
     # print(user.followers)

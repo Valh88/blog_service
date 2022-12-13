@@ -13,8 +13,8 @@ Base = declarative_base()
 
 
 async def get_db():
-  data_base = SessionLocal()
-  try:
-    yield data_base
-  finally:
-    data_base.close()
+    data_base = SessionLocal()
+    try:
+        yield data_base
+    finally:
+        data_base.close()
