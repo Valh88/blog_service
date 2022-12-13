@@ -51,7 +51,8 @@ class PictureOut(BaseModel):
 class TweetsOut(BaseModel):
     id: int
     content: str
-    attachments: List[PictureOut] = []
+    # attachments: List[PictureOut] = []
+    attachments: List[str] = []
     author: UserForMe
     likes: List[UserFor]
 

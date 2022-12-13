@@ -68,6 +68,11 @@ class Tweet(Base):
     def __str__(self):
         return f"{self.content}"
 
+    def get_list_path(self):
+        path_list = []
+        [path_list.append(pick.path) for pick in self.attachments]
+        return path_list
+
 
 class Picture(Base):
     __tablename__ = 'pictures'

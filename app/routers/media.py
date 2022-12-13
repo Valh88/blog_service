@@ -3,8 +3,8 @@ from pathlib import Path
 import shutil
 import uuid
 from fastapi import APIRouter, File, Form, UploadFile, Depends
+from fastapi.responses import FileResponse
 import schemas
-from fastapi.responses import JSONResponse
 
 router = APIRouter(
   prefix='/api',
@@ -21,4 +21,9 @@ async def get_upload_picture(file: UploadFile = Form(...)):
         shutil.copyfileobj(file.file, buffer)
     return {"result": True, "media_id": 1}
 
+
+@router.get('/media/{name}', response_class=FileResponse)
+def get_file(name: str):
+    path = f'images/{name}'
+    return path
 
