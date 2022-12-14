@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security.api_key import APIKeyHeader
 from jose.jwt import encode, decode
 from sqlalchemy.orm import Session
-
+import schemas
 from db.models import User
 from db.database import get_db
 import settings
@@ -40,10 +40,9 @@ def decode_key(encoded_api_key: str):
     return api_key
 
 
-def get_current_user(api_key=Depends(get_apikey_header), db: Session = Depends(get_db)):
+def get_current_user(api_key=Depends(get_apikey_header), db: Session = Depends(get_db)) -> schemas.UserFull:
     current_user = db.query(User).filter(User.api_key == api_key).first()
-    print(current_user, 'get_current_user')
     if current_user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid user or key")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user or key")
     return current_user
 

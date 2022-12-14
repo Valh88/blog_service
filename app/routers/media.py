@@ -13,7 +13,7 @@ router = APIRouter(
 
 
 @router.post('/medias')
-async def get_upload_picture(file: UploadFile = Form(...)):
+async def get_upload_picture(file: UploadFile = File(...)):
     file.filename = str(uuid.uuid4()) + '.jpg'
     path = str(Path(__file__).parents[2]) + f'/images'
     path = f"{path}/{file.filename}"
@@ -24,4 +24,4 @@ async def get_upload_picture(file: UploadFile = Form(...)):
 
 @router.get('/media/{name}', response_class=FileResponse)
 def get_file(name: str):
-   pass
+    pass
