@@ -28,7 +28,7 @@ async def get_user_profile(current_user: str = Depends(get_current_user),
     return {"result": True, "user": current_user}
 
 
-@router.post('/users/{id:int}/follow/')
+@router.post('/users/{id:int}/follow')
 async def follow_user(id: int, current_user: schemas.UserFull = Depends(get_current_user),
                       db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
@@ -41,14 +41,17 @@ async def follow_user(id: int, current_user: schemas.UserFull = Depends(get_curr
     return {"result": True}
 
 
-@router.delete('/users/{id:int}/follow/', )
+@router.delete('/users/{id:int}/follow', )
 async def unfollow_user(id: int, current_user: schemas.UserFull = Depends(get_current_user),
                         db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     following = current_user.following
     if user not in following:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="you are following")
-    current_user.following.remove(user)
+    try:
+        current_user.following.remove(user)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="you are not following")
     db.add(current_user), db.commit()
 
     return {"result": True}
