@@ -34,14 +34,19 @@ def get_apikey_header(api_key: str = Depends(api_key_header)) -> str:
 
 
 def decode_key(encoded_api_key: str):
-    payload = decode(encoded_api_key, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+    payload = decode(
+        encoded_api_key, settings.SECRET_KEY, algorithms=settings.ALGORITHM
+    )
     api_key: str = payload.get("api-key")
     return api_key
 
 
-def get_current_user(api_key=Depends(get_apikey_header), db: Session = Depends(get_db)) -> schemas.UserFull:
+def get_current_user(
+    api_key=Depends(get_apikey_header), db: Session = Depends(get_db)
+) -> schemas.UserFull:
     current_user = db.query(User).filter(User.api_key == api_key).first()
     if current_user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user or key")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user or key"
+        )
     return current_user
-

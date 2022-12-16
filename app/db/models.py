@@ -10,22 +10,24 @@ from db.database import Base
 
 
 Followers = Table(
-    'followers', Base.metadata,
-    Column('user', Integer, ForeignKey('users.id')),
-    Column('follower', Integer, ForeignKey('users.id')),
-    Column('created_at', DateTime(timezone=True), server_default=func.now())
+    "followers",
+    Base.metadata,
+    Column("user", Integer, ForeignKey("users.id")),
+    Column("follower", Integer, ForeignKey("users.id")),
+    Column("created_at", DateTime(timezone=True), server_default=func.now()),
 )
 
 TweetLikeUser = Table(
-    'tweet_like', Base.metadata,
-    Column('tweet', Integer, ForeignKey('tweets.id')),
-    Column('user', Integer, ForeignKey('users.id')),
-    Column('created_at', DateTime(timezone=True), server_default=func.now())
+    "tweet_like",
+    Base.metadata,
+    Column("tweet", Integer, ForeignKey("tweets.id")),
+    Column("user", Integer, ForeignKey("users.id")),
+    Column("created_at", DateTime(timezone=True), server_default=func.now()),
 )
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
@@ -33,11 +35,14 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=False)
     api_key = Column(String, unique=True)
-    tweets = relationship('Tweet', back_populates='author', cascade='delete, all')
-    followers = relation('User', secondary=Followers,
-                         primaryjoin=Followers.c.follower == id,
-                         secondaryjoin=Followers.c.user == id,
-                         backref='following')
+    tweets = relationship("Tweet", back_populates="author", cascade="delete, all")
+    followers = relation(
+        "User",
+        secondary=Followers,
+        primaryjoin=Followers.c.follower == id,
+        secondaryjoin=Followers.c.user == id,
+        backref="following",
+    )
     tweets_like = relationship("Tweet", secondary=TweetLikeUser, back_populates="likes")
 
     def __str__(self):
@@ -45,25 +50,32 @@ class User(Base):
 
     def to_dict(self):
         return {
-            "result": True, "user": {
+            "result": True,
+            "user": {
                 "id": self.id,
                 "name": self.name,
-                "followers": [{"id": user.id, "name": user.name} for user in self.followers],
-                "following": [{"id": user.id, "name": user.name} for user in self.following]
-            }
+                "followers": [
+                    {"id": user.id, "name": user.name} for user in self.followers
+                ],
+                "following": [
+                    {"id": user.id, "name": user.name} for user in self.following
+                ],
+            },
         }
 
 
 class Tweet(Base):
-    __tablename__ = 'tweets'
+    __tablename__ = "tweets"
 
     id = Column(Integer, primary_key=True, index=True)
     content = Column(String(500), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    author_id = Column(Integer, ForeignKey('users.id'))
-    author = relationship('User', back_populates='tweets')
-    attachments = relationship('Picture', back_populates='tweet', cascade='delete-orphan, all')
-    likes = relationship('User', secondary=TweetLikeUser, back_populates='tweets_like')
+    author_id = Column(Integer, ForeignKey("users.id"))
+    author = relationship("User", back_populates="tweets")
+    attachments = relationship(
+        "Picture", back_populates="tweet", cascade="delete-orphan, all"
+    )
+    likes = relationship("User", secondary=TweetLikeUser, back_populates="tweets_like")
 
     def __str__(self):
         return f"{self.content}"
@@ -75,13 +87,12 @@ class Tweet(Base):
 
 
 class Picture(Base):
-    __tablename__ = 'pictures'
+    __tablename__ = "pictures"
 
     id = Column(Integer, primary_key=True, index=True)
     path = Column(String, unique=True, nullable=False)
-    tweet_id = Column(Integer, ForeignKey('tweets.id'), nullable=False)
-    tweet = relationship('Tweet', back_populates='attachments')
+    tweet_id = Column(Integer, ForeignKey("tweets.id"), nullable=False)
+    tweet = relationship("Tweet", back_populates="attachments")
 
     def __str__(self):
         return f"{self.path}"
-
