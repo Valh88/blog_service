@@ -1,0 +1,36 @@
+services:
+  app:
+    restart: always
+    build:
+      context: .
+    volumes:
+      - ./app:/app
+      - ./images:/images
+    command: uvicorn main:app --reload --host 0.0.0.0
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    links:
+      - db:db
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./static:/www/data/static
+      - ./images:/www/data/images
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+
+  db:
+    image: postgres:13.0-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=base

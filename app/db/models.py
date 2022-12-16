@@ -91,7 +91,7 @@ class Picture(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     path = Column(String, unique=True, nullable=False)
-    tweet_id = Column(Integer, ForeignKey("tweets.id"), nullable=False)
+    tweet_id = Column(Integer, ForeignKey("tweets.id"))
     tweet = relationship("Tweet", back_populates="attachments")
 
     def __str__(self):
