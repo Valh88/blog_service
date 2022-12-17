@@ -8,6 +8,7 @@ from db import models
 from sqlalchemy.orm import Session
 from settings import URL
 
+
 router = APIRouter(prefix="/api", tags=["media"])
 
 
