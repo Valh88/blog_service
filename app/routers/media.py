@@ -22,7 +22,7 @@ async def get_upload_picture(
         shutil.copyfileobj(file.file, buffer)
     url = URL + f"/api/media/{file.filename}"
     # __________________________________________________________________
-    pick = models.Picture(path=url, tweet_id=1)
+    pick = models.Picture(path=url)
     db.add(pick)
     db.commit()
     return {"result": True, "media_id": pick.id}

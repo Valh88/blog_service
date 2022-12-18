@@ -25,6 +25,13 @@ TweetLikeUser = Table(
     Column("created_at", DateTime(timezone=True), server_default=func.now()),
 )
 
+PostPictures = Table(
+    "post_pictures",
+    Base.metadata,
+    Column("tweet", Integer, ForeignKey("tweets.id")),
+    Column("pick", Integer, ForeignKey("pictures.id")),
+)
+
 
 class User(Base):
     __tablename__ = "users"
@@ -73,7 +80,7 @@ class Tweet(Base):
     author_id = Column(Integer, ForeignKey("users.id"))
     author = relationship("User", back_populates="tweets")
     attachments = relationship(
-        "Picture", back_populates="tweet", cascade="delete-orphan, all"
+        "Picture", secondary=PostPictures, back_populates="tweet"
     )
     likes = relationship("User", secondary=TweetLikeUser, back_populates="tweets_like")
 
@@ -91,8 +98,7 @@ class Picture(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     path = Column(String, unique=True, nullable=False)
-    tweet_id = Column(Integer, ForeignKey("tweets.id"))
-    tweet = relationship("Tweet", back_populates="attachments")
+    tweet = relationship("Tweet", secondary=PostPictures, back_populates="attachments")
 
     def __str__(self):
         return f"{self.path}"
