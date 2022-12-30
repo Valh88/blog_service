@@ -42,7 +42,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=False)
     api_key = Column(String, unique=True)
-    tweets = relationship("Tweet", back_populates="author", cascade="delete, all")
+    tweets = relationship("Tweet", back_populates="author", cascade="delete-orphan, all")
     followers = relation(
         "User",
         secondary=Followers,
@@ -80,7 +80,7 @@ class Tweet(Base):
     author_id = Column(Integer, ForeignKey("users.id"))
     author = relationship("User", back_populates="tweets")
     attachments = relationship(
-        "Picture", secondary=PostPictures, back_populates="tweet"
+        "Picture", secondary=PostPictures, back_populates="tweet", cascade="delete, all"
     )
     likes = relationship("User", secondary=TweetLikeUser, back_populates="tweets_like")
 
