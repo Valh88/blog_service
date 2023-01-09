@@ -11,6 +11,7 @@ WORKDIR app
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.prod.txt
+
 #RUN adduser \
 #        --disabled-password \
 #        --no-create-home \
