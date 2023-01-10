@@ -13,12 +13,10 @@ engine = create_engine(
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base.metadata.create_all(bind=engine)
-
 
 def override_get_db():
     connection = engine.connect()
-    transaction = connection.begin()
+    # transaction = connection.begin()
     db = Session(bind=connection)
     yield db
 
@@ -41,7 +39,7 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-def create_data(db):
+def create_data(db: Session):
     user1 = User(name="test1", api_key="test1")
     user2 = User(name="test2", api_key="test2")
     user3 = User(name="test3", api_key="test3")
@@ -51,6 +49,7 @@ def create_data(db):
     user1.following.append(user3)
 
     db.add(user1), db.add(user2), db.add(user3)
+    db.commit()
 
     tweet1 = Tweet(content="tweet1", author_id=user2.id)
     tweet2 = Tweet(content="tweet2", author_id=user2.id)
@@ -61,19 +60,12 @@ def create_data(db):
     tweet4.likes.append(user1)
 
     db.add(tweet1), db.add(tweet2), db.add(tweet3), db.add(tweet4)
+    db.commit()
 
-    pick1 = Picture(
-        path="http://127.0.0.1:8080/api/media/c2044402-8812-4e35-9d39-75a83b1db1bb.jpg",
-        tweet_id=0,
-    )
-    pick2 = Picture(
-        path="http://127.0.0.1:8080/api/media/1cde96d0-6bb1-4fbd-85c5-c99ea60b1d8e.jpg",
-        tweet_id=0,
-    )
-
-    tweet1.attachments.append(pick1)
-    tweet2.attachments.append(pick2)
-    db.add(tweet1), db.add(tweet2)
+    pick1 = Picture(path="api/media/c2044402-8812-4e35-9d39-75a83b1db1bb.jpg")
+    pick1.tweet.append(tweet1)
+    pick2 = Picture(path="api/media/1cde96d0-6bb1-4fbd-85c5-c99ea60b1d8e.jpg")
+    pick2.tweet.append(tweet2)
     db.commit()
 
 
@@ -106,14 +98,57 @@ def test_create_data(db):
     assert True
 
 
-def test_get_current_user():
+def test_current_user():
+
     response = client.get("api/users/me")
     assert response.status_code == 401
     assert response.text == '{"detail":"Invalid user or key"}'
 
     client.headers = {"api-key": "test2"}
+
     response = client.get("api/users/me")
     assert response.status_code == 200
 
     data = json.loads(response.text)
     assert data["result"]
+
+    response = client.get("api/tweets")
+    data = json.loads(response.text)
+    assert len(data["tweets"]) == 4
+
+    response = client.post(
+        "api/tweets", json={"tweet_data": "test_data", "tweet_media_ids": [0]}
+    )
+    assert response.text == '{"result":true,"tweet_id":5}'
+
+    response = client.delete("api/tweets/1")
+    assert response.status_code == 200
+    assert response.text == '{"result":true}'
+
+    response = client.delete("api/tweet/1", headers={"api-key": "test1"})
+    assert response.status_code == 404
+
+    client.headers = {"api-key": "test2"}
+
+    response = client.post("api/tweets/2/likes")
+    assert response.status_code == 200
+    assert response.json() == {"result": True}
+
+    response = client.delete("api/tweets/2/likes")
+    assert response.status_code == 200
+    assert response.json() == {"result": True}
+
+    response = client.post("api/users/1/follow")
+    assert response.status_code == 200
+    assert response.json() == {"result": True}
+
+    response = client.delete("api/tweets/1/follow")
+    assert response.status_code == 200
+    assert response.json() == {"result": True}
+
+    with open("../test_image.jpg", mode="rb") as file:
+        data = file.read()
+    response = client.post(
+        "api/medias", files={"file": data}, headers={"api-key": "test2"}
+    )
+    assert response.status_code == 200

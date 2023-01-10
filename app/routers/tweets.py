@@ -3,12 +3,14 @@ import schemas
 from sqlalchemy.orm import Session
 from db import models
 from db.database import get_db
-from security import get_apikey_header, get_current_user
+from security import get_current_user
+from settings import logger
 
 router = APIRouter(prefix="/api", tags=["tweets"])
 
 
 @router.get("/tweets", response_model=schemas.TweetResult)
+@logger.catch
 async def all_tweets(
     current_user: schemas.UserFull = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -22,7 +24,7 @@ async def all_tweets(
                 content=tweet.content,
                 author=tweet.author,
                 likes=[{"user_id": user.id, "name": user.name} for user in tweet.likes],
-                attachments=tweet.get_list_path(),
+                attachments=tweet.get_list_pa(),
             )
             for tweet in tweets
         ],
@@ -30,6 +32,7 @@ async def all_tweets(
 
 
 @router.post("/tweets")
+@logger.catch
 async def create_tweet(
     tweet: schemas.TweetAdd,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -47,6 +50,7 @@ async def create_tweet(
 
 
 @router.delete("/tweets/{id:int}")
+@logger.catch
 async def delete_tweet(
     id: int,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -64,6 +68,7 @@ async def delete_tweet(
 
 
 @router.post("/tweets/{id:int}/likes")
+@logger.catch
 async def like_tweet(
     id: int,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -80,6 +85,7 @@ async def like_tweet(
 
 
 @router.delete("/tweets/{id:int}/likes")
+@logger.catch
 async def delete_like_tweet(
     id: int,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -105,6 +111,7 @@ async def delete_like_tweet(
 
 
 @router.delete("/tweets/{id:int}/follow")
+@logger.catch
 async def unfollow_user(
     id: int,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -123,5 +130,4 @@ async def unfollow_user(
             status_code=status.HTTP_404_NOT_FOUND, detail="you are not following"
         )
     db.add(current_user), db.commit()
-
     return {"result": True}

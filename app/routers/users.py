@@ -5,6 +5,7 @@ from db import models
 from security import get_apikey_header, get_current_user
 from fastapi import status
 import schemas
+from settings import logger
 
 router = APIRouter(prefix="/api", tags=["users"])
 
@@ -17,6 +18,7 @@ router = APIRouter(prefix="/api", tags=["users"])
     response_description="Успешный ответ",
     status_code=status.HTTP_200_OK,
 )
+@logger.catch
 async def get_user_profile(
     current_user: schemas.UserFull = Depends(get_current_user),
 ) -> schemas.UserMeOut:
@@ -28,6 +30,7 @@ async def get_user_profile(
 
 
 @router.delete("/users/{id:int}/follow")
+@logger.catch
 async def follow_user(
     id: int,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -46,6 +49,7 @@ async def follow_user(
 
 @router.post("/users/{id:int}/follow")
 # @router.delete('/users/{id:int}/follow')
+@logger.catch
 async def unfollow_user(
     id: int,
     current_user: schemas.UserFull = Depends(get_current_user),
@@ -69,6 +73,7 @@ async def unfollow_user(
 
 
 @router.get("/users/{id:int}", response_model=schemas.UserMeOut)
+@logger.catch
 async def get_any_users_profile(
     id: int,
     curren_user: schemas.UserFull = Depends(get_current_user),

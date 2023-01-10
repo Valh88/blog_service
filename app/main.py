@@ -1,13 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, responses
 from fastapi.middleware.cors import CORSMiddleware
-
 from routers import tweets, users, media
+from settings import logger
 
 app = FastAPI()
 
 app.include_router(tweets.router)
 app.include_router(users.router)
 app.include_router(media.router)
+
+
+@app.get("/")
+@logger.catch
+async def main_page():
+    return responses.RedirectResponse("/index.html")
+
 
 origins = [
     "http://localhost:8080",

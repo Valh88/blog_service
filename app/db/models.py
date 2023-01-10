@@ -8,7 +8,6 @@ from db.database import Base
 # alembic revision --message="migrate" --autogenerate
 # alembic upgrade head
 
-
 Followers = Table(
     "followers",
     Base.metadata,
@@ -42,7 +41,9 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=False)
     api_key = Column(String, unique=True)
-    tweets = relationship("Tweet", back_populates="author", cascade="delete-orphan, all")
+    tweets = relationship(
+        "Tweet", back_populates="author", cascade="delete-orphan, all"
+    )
     followers = relation(
         "User",
         secondary=Followers,

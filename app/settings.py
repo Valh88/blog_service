@@ -1,4 +1,6 @@
 from environs import Env
+from loguru import logger
+import sys
 
 env = Env()
 env.read_env(".env")
@@ -11,6 +13,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 
 DATA_BASE_URL = env.str("DATA_BASE_URL")
 
-
-SQLALCHEMY_DATABASE_URL = DATA_BASE_URL
-# SQLALCHEMY_DATABASE_URL = 'sqlite:///db.db'
+logger.add(
+    sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO"
+)
+logger.add("./log.log", rotation="5 MB")

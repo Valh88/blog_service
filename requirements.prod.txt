@@ -7,3 +7,5 @@ uvicorn==0.20.0
 pydentic
 python-jose==3.3.0
 environs==9.5.0
+aiofiles==22.1.0
+loguru==0.6.0
