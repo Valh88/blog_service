@@ -24,7 +24,7 @@ async def all_tweets(
                 content=tweet.content,
                 author=tweet.author,
                 likes=[{"user_id": user.id, "name": user.name} for user in tweet.likes],
-                attachments=tweet.get_list_pa(),
+                attachments=tweet.get_list_path(),
             )
             for tweet in tweets
         ],
