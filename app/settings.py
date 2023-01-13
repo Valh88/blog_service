@@ -3,7 +3,7 @@ from loguru import logger
 import sys
 
 env = Env()
-env.read_env(".env")
+env.read_env()
 
 ALGORITHM = "HS256"
 

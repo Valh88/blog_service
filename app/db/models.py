@@ -89,9 +89,7 @@ class Tweet(Base):
         return f"{self.content}"
 
     def get_list_path(self):
-        path_list = []
-        [path_list.append(pick.path) for pick in self.attachments]
-        return path_list
+        return [pick.path for pick in self.attachments]
 
 
 class Picture(Base):
